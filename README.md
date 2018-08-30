@@ -17,6 +17,10 @@ plugins = nose2.plugins.nose2-rt.rt
 [rt]
 endpoint = http://127.0.0.1  # Your API endpoint
 ```
+### Launch
+```
+nose2 -rt
+```
 
 ### POST requests examples produced by nose2-rt
 
