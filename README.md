@@ -30,8 +30,8 @@ nose2 -rt
    "type": "startTestRun",
    "job_id": "2e0a9169-2a01-41fa-b94f-6ac3385935d7",
    "tests": "{
-                'test_method1': 'project.folder.test_something.TestSomething', 
-                'test_method2': 'project.folder.test_something2.TestSomething2'
+                \"test_method1\": \"project.folder.test_something.TestSomething\", 
+                \"test_method2\": \"project.folder.test_something2.TestSomething2\"
              }"
 }
 ```
