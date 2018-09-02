@@ -2,9 +2,11 @@
 import logging
 import requests
 import uuid
+import json
 
 from nose2.events import Plugin
 from nose2 import result
+
 
 log = logging.getLogger('nose2.plugins.nose2-rt.rt')
 
@@ -36,7 +38,7 @@ class Rt(Plugin):
         self.post({
             'type': "startTestRun",
             'job_id': self.uuid,
-            'tests': str(tests),
+            'tests': tests,
         })
 
     def startTest(self, event):
@@ -118,5 +120,7 @@ class Rt(Plugin):
                 for test_list in test_data:
                     for test in test_list._tests:
                         test_data = (str(test).split(" "))
-                        tests[test_data[0]] = str(test_data[1])[1:-1]
-        return tests
+                        tests[str(test_data[0])] = str(test_data[1])[1:-1]
+        print("RESULT")
+        print(tests)
+        return json.dumps(tests)
