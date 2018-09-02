@@ -20,7 +20,7 @@ class Rt(Plugin):
         self.endpoint = self.config.as_str(
             'endpoint', '')
 
-        self.uuid = uuid.uuid4()
+        self.uuid = str(uuid.uuid4())
         self.success = 0
         self.errors = 0
         self.failed = 0
@@ -31,7 +31,8 @@ class Rt(Plugin):
         self.test_outcome = None
 
     def post(self, payload):
-        requests.post(self.endpoint, data=payload)
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        requests.post(self.endpoint, data=json.dumps(payload), headers=headers)
 
     def startTestRun(self, event):
         tests = self.getTests(event)
@@ -39,6 +40,7 @@ class Rt(Plugin):
             'type': "startTestRun",
             'job_id': self.uuid,
             'tests': tests,
+            'startTime': str(event.startTime)
         })
 
     def startTest(self, event):
@@ -50,7 +52,7 @@ class Rt(Plugin):
             'type': 'startTest',
             'job_id': self.uuid,
             'test': test_id,
-            'startTime': event.startTime})
+            'startTime': str(event.startTime)})
 
     def testOutcome(self, event):
         msg = ''
@@ -93,9 +95,9 @@ class Rt(Plugin):
             'type': 'stopTest',
             'job_id': self.uuid,
             'test': test_id,
-            'stopTime': event.stopTime,
-            'status': self.test_outcome[0],
-            'msg': self.test_outcome[1]})
+            'stopTime': str(event.stopTime),
+            'status': str(self.test_outcome[0]),
+            'msg': str(self.test_outcome[1])})
 
     def stopTestRun(self, event):
         self.success = str(self.success)
@@ -110,6 +112,7 @@ class Rt(Plugin):
             'tests_errors': self.errors,
             'tests_failed': self.failed,
             'tests_skipped': self.skipped,
+            'stopTime': str(event.stopTime),
             'job_time_taken': self.timeTaken})
 
     def getTests(self, event):
@@ -121,6 +124,4 @@ class Rt(Plugin):
                     for test in test_list._tests:
                         test_data = (str(test).split(" "))
                         tests[str(test_data[0])] = str(test_data[1])[1:-1]
-        print("RESULT")
-        print(tests)
-        return json.dumps(tests)
+        return tests
