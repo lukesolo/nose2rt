@@ -113,7 +113,7 @@ class Rt(Plugin):
             'tests_failed': self.failed,
             'tests_skipped': self.skipped,
             'stopTime': str(event.stopTime),
-            'job_time_taken': self.timeTaken})
+            'timeTaken': self.timeTaken})
 
     def getTests(self, event):
         suite = event.suite
@@ -122,6 +122,8 @@ class Rt(Plugin):
             for test_data in suite_data:
                 for test_list in test_data:
                     for test in test_list._tests:
+                        # print(test)
                         test_data = (str(test).split(" "))
-                        tests[str(test_data[0])] = str(test_data[1])[1:-1]
+                        # print(test_data)
+                        tests[str(test_data[0])] = test.id()
         return tests
