@@ -1,10 +1,12 @@
-
+import unittest
 import logging
 import requests
 import uuid
+import json
 
 from nose2.events import Plugin
 from nose2 import result
+
 
 log = logging.getLogger('nose2.plugins.nose2-rt.rt')
 
@@ -18,7 +20,7 @@ class Rt(Plugin):
         self.endpoint = self.config.as_str(
             'endpoint', '')
 
-        self.uuid = uuid.uuid4()
+        self.uuid = str(uuid.uuid4())
         self.success = 0
         self.errors = 0
         self.failed = 0
@@ -29,14 +31,16 @@ class Rt(Plugin):
         self.test_outcome = None
 
     def post(self, payload):
-        requests.post(self.endpoint, data=payload)
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        requests.post(self.endpoint, data=json.dumps(payload), headers=headers)
 
     def startTestRun(self, event):
         tests = self.getTests(event)
         self.post({
             'type': "startTestRun",
             'job_id': self.uuid,
-            'tests': str(tests),
+            'tests': tests,
+            'startTime': str(event.startTime)
         })
 
     def startTest(self, event):
@@ -48,7 +52,7 @@ class Rt(Plugin):
             'type': 'startTest',
             'job_id': self.uuid,
             'test': test_id,
-            'startTime': event.startTime})
+            'startTime': str(event.startTime)})
 
     def testOutcome(self, event):
         msg = ''
@@ -91,9 +95,9 @@ class Rt(Plugin):
             'type': 'stopTest',
             'job_id': self.uuid,
             'test': test_id,
-            'stopTime': event.stopTime,
-            'status': self.test_outcome[0],
-            'msg': self.test_outcome[1]})
+            'stopTime': str(event.stopTime),
+            'status': str(self.test_outcome[0]),
+            'msg': str(self.test_outcome[1])})
 
     def stopTestRun(self, event):
         self.success = str(self.success)
@@ -108,7 +112,8 @@ class Rt(Plugin):
             'tests_errors': self.errors,
             'tests_failed': self.failed,
             'tests_skipped': self.skipped,
-            'job_time_taken': self.timeTaken})
+            'stopTime': str(event.stopTime),
+            'timeTaken': self.timeTaken})
 
     def getTests(self, event):
         suite = event.suite
@@ -116,7 +121,11 @@ class Rt(Plugin):
         for suite_data in suite:
             for test_data in suite_data:
                 for test_list in test_data:
-                    for test in test_list._tests:
-                        test_data = (str(test).split(" "))
-                        tests[test_data[0]] = str(test_data[1])[1:-1]
+                    if isinstance(test_list, unittest.suite.TestSuite):
+                        for test in test_list._tests:
+                            test_data = (str(test).split(" "))
+                            tests[str(test_data[0])] = test.id()
+                    else:
+                        test_data = (str(test_list).split(" "))
+                        tests[str(test_data[0])] = test_list.id()
         return tests
