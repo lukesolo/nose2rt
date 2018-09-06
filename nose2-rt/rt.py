@@ -1,4 +1,4 @@
-
+import unittest
 import logging
 import requests
 import uuid
@@ -121,9 +121,11 @@ class Rt(Plugin):
         for suite_data in suite:
             for test_data in suite_data:
                 for test_list in test_data:
-                    for test in test_list._tests:
-                        # print(test)
-                        test_data = (str(test).split(" "))
-                        # print(test_data)
-                        tests[str(test_data[0])] = test.id()
+                    if isinstance(test_list, unittest.suite.TestSuite):
+                        for test in test_list._tests:
+                            test_data = (str(test).split(" "))
+                            tests[str(test_data[0])] = test.id()
+                    else:
+                        test_data = (str(test_list).split(" "))
+                        tests[str(test_data[0])] = test_list.id()
         return tests
