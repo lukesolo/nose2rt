@@ -16,10 +16,12 @@ plugins = nose2.plugins.nose2-rt.rt
 
 [rt]
 endpoint = http://127.0.0.1  # Your API endpoint
+show_errors = True # show POST errors
 ```
 ### Launch
 ```
-nose2 -rt
+nose2 -RT -> will launch nose2 with nose2-rt plugin.
+nose2 -RT -RTE "DEV" -> will launch nose2 and send your environment name as additional info to the API server. 
 ```
 
 ### POST requests examples produced by nose2-rt
