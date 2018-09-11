@@ -32,7 +32,7 @@ class Rt(Plugin):
         self.stop = None
         self.test_outcome = None
         self.attrs = []
-        self.addArgument(self.attrs, "RTE" "rtenv")
+        self.addArgument(self.attrs, "RTE", "rtenv")
 
     def post(self, payload):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
