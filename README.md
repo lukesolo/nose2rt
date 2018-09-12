@@ -29,49 +29,51 @@ nose2 -RT -RTE "DEV" -> will launch nose2 and send your environment name as addi
 #### startTestRun
 ```
 {
-   "type": "startTestRun",
-   "job_id": "2e0a9169-2a01-41fa-b94f-6ac3385935d7",
-   "tests": "{
-                \"test_method1\": \"project.folder.test_something.TestSomething\", 
-                \"test_method2\": \"project.folder.test_something2.TestSomething2\"
-             }"
+	"type": "startTestRun",
+	"job_id": "07942d9c-03e8-4164-8709-2314119ad60b",
+	"tests": {
+		"test_method1": "project.folder.test_something.TestSomething.test_method1",
+		"test_method2": "project.folder.test_something2.TestSomething2.test_method2"
+	},
+	"env": "DEV",
+	"startTime": "1536775271.8475103"
 }
 ```
 #### startTest
 ```
 {
-  "type": "startTest",
-        "job_id": "2e0a9169-2a01-41fa-b94f-6ac3385935d7",
-        "test": "project.folder.test_something.TestSomething.test_something",
-        "startTime": "1535663071.6408737"
-      }
+	"type": "startTest",
+	"job_id": "07942d9c-03e8-4164-8709-2314119ad60b",
+	"test": "project.folder.test_something.TestSomething.test_something",
+	"startTime": "1536775300.8666112"
+}
 ```
 #### stopTest
 ```
 {
-  "type": "stopTest",
-  "job_id": "2e0a9169-2a01-41fa-b94f-6ac3385935d7",
-  "test": "project.folder.test_something.TestSomething.test_something",
-  "stopTime": "1535663089.4163303",
-  "status": "error",
-  "msg": [
+	"type": "stopTest",
+	"job_id": "07942d9c-03e8-4164-8709-2314119ad60b",
+	"test": "project.folder.test_something.TestSomething.test_something",
+	"stopTime": "1536775311.1239314",
+	"status": "error",
+	"msg": [
           "<class 'AttributeError'>",
           "'NoneType' object has no attribute 'location'",
           "<traceback object at 0x7ffac0a10f89>"
-        ]
-      }
-    }
+          ]
+}
 ```
 #### stopRun
 ```
 {
-  "type": "stopTestRun",
-  "job_id": "2e0a9169-2a01-41fa-b94f-6ac3385935d7",
-  "tests_success": "1",
-  "tests_errors": "1",
-  "tests_failed": "0",
-  "tests_skipped": "0",
-  "job_time_taken": "24.380"
+	"type": "stopTestRun",
+	"job_id": "07942d9c-03e8-4164-8709-2314119ad60b",
+	"tests_success": "1",
+	"tests_errors": "1",
+	"tests_failed": "0",
+	"tests_skipped": "0",
+	"stopTime": "1536775311.141048",
+	"timeTaken": "39.294"
 }
 ```      
 
