@@ -49,8 +49,9 @@ class Rt(Plugin):
         if len(self.attrs) > 0:
             env = self.attrs[0]
         else:
-            env = ""
+            env = None
         self.post({
+            'fw': "1",
             'type': "startTestRun",
             'job_id': self.uuid,
             'tests': tests,
@@ -64,7 +65,8 @@ class Rt(Plugin):
         test_id_str = test.id().split('\n')
         test_id = test_id_str[0]
         self.post({
-            'type': 'startTest',
+            'fw': "1",
+            'type': 'startTestItem',
             'job_id': self.uuid,
             'test': test_id,
             'startTime': str(event.startTime)})
@@ -79,25 +81,19 @@ class Rt(Plugin):
         error_text = ''
         status = ''
         if event.outcome == result.ERROR:
-            self.errors += 1
             error_text = msg
             status = 'error'
         elif event.outcome == result.FAIL and not event.expected:
-            self.failed += 1
             error_text = msg
             status = 'failed'
         elif event.outcome == result.PASS and not event.expected:
-            self.skipped += 1
             status = 'skipped'
         elif event.outcome == result.SKIP:
-            self.skipped += 1
             status = 'skipped'
         elif event.outcome == result.FAIL and event.expected:
-            self.skipped += 1
             error_text = msg
             status = 'skipped'
         elif event.outcome == result.PASS and event.expected:
-            self.success += 1
             status = 'passed'
 
         self.test_outcome = status, error_text
@@ -107,7 +103,8 @@ class Rt(Plugin):
         test_id_str = test.id().split('\n')
         test_id = test_id_str[0]
         self.post({
-            'type': 'stopTest',
+            'fw': "1",
+            'type': 'stopTestItem',
             'job_id': self.uuid,
             'test': test_id,
             'stopTime': str(event.stopTime),
@@ -115,18 +112,11 @@ class Rt(Plugin):
             'msg': str(self.test_outcome[1])})
 
     def stopTestRun(self, event):
-        self.success = str(self.success)
-        self.errors = str(self.errors)
-        self.failed = str(self.failed)
-        self.skipped = str(self.skipped)
         self.timeTaken = "%.3f" % event.timeTaken
         self.post({
+            'fw': "1",
             'type': 'stopTestRun',
             'job_id': self.uuid,
-            'tests_success': self.success,
-            'tests_errors': self.errors,
-            'tests_failed': self.failed,
-            'tests_skipped': self.skipped,
             'stopTime': str(event.stopTime),
             'timeTaken': self.timeTaken})
 
