@@ -1,30 +1,30 @@
-# nose2-rt - Real-time status update plugin via HTTP
+# nose2rt - nose2 data collector for Testgr
 
-Using following plugin you can send HTTP POST requests with test status updates to your API endpoint.
+Plugin for sending HTTP POST updates to your **Testgr** service.
 
 ### Installing
 
-Put nose2-rt folder in your nose2/plugins folder.
+```pip install nose2rt```
 
-Find your nose2 config file and configure it somehow as described below.
+Find your nose2 config file and configure as described below.
 
 Example:
 
 ```
 [unittest]
-plugins = nose2.plugins.nose2-rt.rt
+plugins = nose2rt.rt
 
 [rt]
-endpoint = http://127.0.0.1  # Your API endpoint
+endpoint = http://127.0.0.1/loader  # Your Testgr service URL
 show_errors = True # show POST errors
 ```
 ### Launch
 ```
-nose2 -RT -> will launch nose2 with nose2-rt plugin.
-nose2 -RT -RTE "DEV" -> will launch nose2 and send your environment name as additional info to the API server. 
+nose2 -RT -> will launch nose2 with nose2rt plugin.
+nose2 -RT -RTE "DEV" -> will launch nose2 and send your environment name as additional info to the Testgr server. 
 ```
 
-### POST requests examples produced by nose2-rt
+### POST requests examples produced by nose2rt
 
 #### startTestRun
 ```
