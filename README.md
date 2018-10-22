@@ -83,6 +83,6 @@ nose2 -RT -RTE "DEV" -> will launch nose2 and send your environment name as addi
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 
