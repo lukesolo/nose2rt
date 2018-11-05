@@ -1,5 +1,4 @@
 import unittest
-import logging
 import requests
 import uuid
 import json
@@ -8,12 +7,9 @@ from nose2.events import Plugin
 from nose2 import result
 
 
-log = logging.getLogger('nose2.plugins.nose2-rt.rt')
-
-
 class Rt(Plugin):
     configSection = 'rt'
-    commandLineSwitch = ('RT', 'rt', 'Real-time status update via HTTP')
+    commandLineSwitch = (None, 'rt', 'Enable data collector for Testgr')
 
     def __init__(self):
 
@@ -32,7 +28,20 @@ class Rt(Plugin):
         self.stop = None
         self.test_outcome = None
         self.attrs = []
-        self.addArgument(self.attrs, "RTE", "rtenv")
+        self.addArgument(self.attrs, None, "rte", "With -rte \"your_environment\" option you can send "
+                                                  "additional info to the Testgr sertver")
+
+        group = self.session.pluginargs
+        group.add_argument('--rt-job-report', action='store_true', dest='rt_job_report',
+                           help='Send Testgr job result via email')
+
+    def handleArgs(self, event):
+        self.send_report_arg = event.args.rt_job_report
+
+    def send_report(self):
+        if self.send_report_arg is True:
+            return "1"
+        return "0"
 
     def post(self, payload):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
@@ -118,7 +127,8 @@ class Rt(Plugin):
             'type': 'stopTestRun',
             'job_id': self.uuid,
             'stopTime': str(event.stopTime),
-            'timeTaken': self.timeTaken})
+            'timeTaken': self.timeTaken,
+            'send_report': self.send_report()})
 
     def getTests(self, event):
         suite = event.suite
