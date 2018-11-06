@@ -28,7 +28,7 @@ class Rt(Plugin):
         self.stop = None
         self.test_outcome = None
         self.attrs = []
-        self.addArgument(self.attrs, None, "rte", "With -rte \"your_environment\" option you can send "
+        self.addArgument(self.attrs, None, "rte", "With --rte \"your_environment\" option you can send "
                                                   "additional info to the Testgr sertver")
 
         group = self.session.pluginargs
