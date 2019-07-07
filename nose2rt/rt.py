@@ -2,6 +2,7 @@ import unittest
 import requests
 import uuid
 import json
+import datetime
 
 from nose2.events import Plugin
 from nose2 import result
@@ -28,6 +29,7 @@ class Rt(Plugin):
         self.stop = None
         self.test_outcome = None
         self.attrs = []
+        self.tests = None
         self.addArgument(self.attrs, None, "rte", "With --rte \"your_environment\" option you can send "
                                                   "additional info to the Testgr sertver")
 
@@ -54,7 +56,7 @@ class Rt(Plugin):
                 pass
 
     def startTestRun(self, event):
-        tests = self.getTests(event)
+        self.tests = self.getTests(event)
         if len(self.attrs) > 0:
             env = self.attrs[0]
         else:
@@ -63,7 +65,8 @@ class Rt(Plugin):
             'fw': "1",
             'type': "startTestRun",
             'job_id': self.uuid,
-            'tests': tests,
+            'tests': self.tests[0],
+            'test_uuids': self.tests[1],
             'env': env,
             'startTime': str(event.startTime)
         })
@@ -78,6 +81,7 @@ class Rt(Plugin):
             'type': 'startTestItem',
             'job_id': self.uuid,
             'test': test_id,
+            'uuid': self.tests[1][test_id],
             'startTime': str(event.startTime)})
 
     def testOutcome(self, event):
@@ -116,6 +120,7 @@ class Rt(Plugin):
             'type': 'stopTestItem',
             'job_id': self.uuid,
             'test': test_id,
+            'uuid': self.tests[1][test_id],
             'stopTime': str(event.stopTime),
             'status': str(self.test_outcome[0]),
             'msg': str(self.test_outcome[1])})
@@ -133,6 +138,7 @@ class Rt(Plugin):
     def getTests(self, event):
         suite = event.suite
         tests = {}
+        test_uuids = {}
         for suite_data in suite:
             for test_data in suite_data:
                 for test_list in test_data:
@@ -140,7 +146,9 @@ class Rt(Plugin):
                         for test in test_list._tests:
                             test_data = (str(test).split(" "))
                             tests[str(test_data[0])] = test.id()
+                            test_uuids[test.id()] = str(uuid.uuid4())
                     else:
                         test_data = (str(test_list).split(" "))
                         tests[str(test_data[0])] = test_list.id()
-        return tests
+                        test_uuids[test_list.id()] = str(uuid.uuid4())
+        return tests, test_uuids
