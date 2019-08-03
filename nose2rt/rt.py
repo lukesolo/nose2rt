@@ -2,7 +2,6 @@ import unittest
 import requests
 import uuid
 import json
-import datetime
 
 from nose2.events import Plugin
 from nose2 import result
@@ -67,6 +66,7 @@ class Rt(Plugin):
             'job_id': self.uuid,
             'tests': self.tests[0],
             'test_uuids': self.tests[1],
+            'test_descriptions': self.tests[2],
             'env': env,
             'startTime': str(event.startTime)
         })
@@ -90,7 +90,6 @@ class Rt(Plugin):
             msg = event.exc_info
         elif event.reason:
             msg = event.reason
-
         error_text = ''
         status = ''
         if event.outcome == result.ERROR:
@@ -107,6 +106,7 @@ class Rt(Plugin):
             error_text = msg
             status = 'skipped'
         elif event.outcome == result.PASS and event.expected:
+            error_text = msg
             status = 'passed'
 
         self.test_outcome = status, error_text
@@ -139,16 +139,21 @@ class Rt(Plugin):
         suite = event.suite
         tests = {}
         test_uuids = {}
+        test_descriptions = {}
         for suite_data in suite:
             for test_data in suite_data:
                 for test_list in test_data:
                     if isinstance(test_list, unittest.suite.TestSuite):
                         for test in test_list._tests:
+                            test_uuid = str(uuid.uuid4())
                             test_data = (str(test).split(" "))
                             tests[str(test_data[0])] = test.id()
-                            test_uuids[test.id()] = str(uuid.uuid4())
+                            test_uuids[test.id()] = test_uuid
+                            test_descriptions[test_uuid] = test.shortDescription()
                     else:
+                        test_uuid = str(uuid.uuid4())
                         test_data = (str(test_list).split(" "))
                         tests[str(test_data[0])] = test_list.id()
-                        test_uuids[test_list.id()] = str(uuid.uuid4())
-        return tests, test_uuids
+                        test_uuids[test_list.id()] = test_uuid
+                        test_descriptions[test_uuid] = test_list.shortDescription()
+        return tests, test_uuids, test_descriptions
