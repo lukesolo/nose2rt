@@ -3,6 +3,8 @@ import requests
 import uuid
 import json
 
+from concurrent.futures import ThreadPoolExecutor
+
 from nose2.events import Plugin
 from nose2 import result
 
@@ -12,6 +14,7 @@ class Rt(Plugin):
     commandLineSwitch = (None, 'rt', 'Enable data collector for Testgr')
 
     def __init__(self):
+        self.pool = ThreadPoolExecutor(max_workers=1)
 
         self.endpoint = self.config.as_str(
             'endpoint', '')
@@ -45,14 +48,16 @@ class Rt(Plugin):
         return "0"
 
     def post(self, payload):
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        try:
-            requests.post(self.endpoint, data=json.dumps(payload), headers=headers)
-        except requests.exceptions.ConnectionError as error:
-            if self.show_errors:
-                print(error)
-            else:
-                pass
+        def _post():
+            headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+            try:
+                requests.post(self.endpoint, data=json.dumps(payload), headers=headers)
+            except requests.exceptions.ConnectionError as error:
+                if self.show_errors:
+                    print(error)
+                else:
+                    pass
+        self.pool.submit(_post)
 
     def startTestRun(self, event):
         self.tests = self.getTests(event)
@@ -134,6 +139,7 @@ class Rt(Plugin):
             'stopTime': str(event.stopTime),
             'timeTaken': self.timeTaken,
             'send_report': self.send_report()})
+        self.pool.shutdown(wait=True)
 
     def getTests(self, event):
         suite = event.suite
